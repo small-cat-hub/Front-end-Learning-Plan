@@ -1,181 +1,211 @@
 
-# JavaScript 第二周：数据结构与函数进阶
+# JavaScript 第二周（超详细版）：数据结构与函数进阶
+
 (*11.15~11.21*)
-## 🎯 学习目标
-- 理解 JavaScript 中的数组与对象的核心操作  
-- 掌握数组的高阶方法（map、filter、reduce 等）  
-- 理解函数作为一等公民的概念（函数可以作为参数或返回值）  
-- 理解闭包（Closure）与递归（Recursion）  
-- 初步掌握 ES6 的解构赋值与扩展运算符  
+---
+
+## 🎯 本周学习目标
+- 深入理解数组、对象、Map、Set 的工作原理与使用场景。
+- 熟悉闭包、作用域链、递归等函数进阶概念。
+- 掌握高阶函数和函数式编程思想。
+- 提高编写可复用、模块化代码的能力。
 
 ---
 
-## 📘 一、数组基础与常用操作
+## 一、数组（Array）—— 从基础到进阶
 
-数组是 JavaScript 中最常用的数据结构之一，用于存储有序的数据集合。
+### 1. 数组的本质
+JavaScript 中数组是一种特殊的对象（`typeof [] === 'object'`）。
+它的键实际上是字符串形式的索引，且具有一个特殊的属性 `length` 表示数组长度。
 
-### 1. 创建数组
-```js
-let arr1 = [1, 2, 3];
-let arr2 = new Array(4, 5, 6);
-console.log(arr1, arr2);
-```
+数组的索引从 0 开始，超出当前长度时会自动扩展。
 
-### 2. 访问与修改数组
-```js
-let fruits = ["apple", "banana", "cherry"];
-console.log(fruits[0]); // apple
-fruits[1] = "orange";
-console.log(fruits); // ["apple", "orange", "cherry"]
-```
-
-### 3. 数组常用方法
-| 方法 | 功能 |
-|------|------|
-| `push()` | 在末尾添加元素 |
-| `pop()` | 删除最后一个元素 |
-| `shift()` | 删除第一个元素 |
-| `unshift()` | 在开头添加元素 |
-| `indexOf()` | 查找元素下标 |
-| `includes()` | 判断是否包含元素 |
-
-```js
-let nums = [1, 2, 3];
-nums.push(4);
-console.log(nums); // [1,2,3,4]
-nums.pop();
-console.log(nums); // [1,2,3]
-```
-
----
-
-## 📘 二、数组的高阶方法
-
-### 1. forEach()
 ```js
 let arr = [1, 2, 3];
-arr.forEach(item => console.log(item * 2));
+arr[5] = 6;
+console.log(arr.length); // 6
+console.log(arr); // [1, 2, 3, empty × 2, 6]
 ```
 
-### 2. map()
+### 2. 数组的常用操作方法
+| 分类 | 方法 | 是否修改原数组 | 说明 |
+|------|------|----------------|------|
+| 增加/删除 | `push()`, `pop()`, `shift()`, `unshift()`, `splice()` | ✅ | 改变原数组 |
+| 访问 | `slice()`, `concat()` | ❌ | 不修改原数组 |
+| 查找 | `indexOf()`, `find()`, `includes()` | ❌ | |
+| 遍历 | `forEach()`, `map()`, `filter()`, `reduce()` | ❌ | |
+| 其他 | `sort()`, `reverse()` | ✅ | 改变原数组 |
+
+#### 示例：
 ```js
-let doubled = arr.map(x => x * 2);
-console.log(doubled); // [2, 4, 6]
+const arr = [1, 2, 3, 4, 5];
+const squares = arr.map(x => x * x);
+console.log(squares); // [1, 4, 9, 16, 25]
 ```
 
-### 3. filter()
+### 3. reduce 的应用
+`reduce()` 可将数组归约为单个值，如求和、计数、分组等：
+
 ```js
-let even = arr.filter(x => x % 2 === 0);
-console.log(even); // [2]
+const nums = [1, 2, 3, 4];
+const sum = nums.reduce((acc, cur) => acc + cur, 0);
+console.log(sum); // 10
 ```
 
-### 4. reduce()
+它还能实现复杂操作：
+
 ```js
-let sum = arr.reduce((acc, cur) => acc + cur, 0);
-console.log(sum); // 6
+const fruits = ['apple', 'banana', 'apple', 'orange'];
+const count = fruits.reduce((acc, item) => {
+  acc[item] = (acc[item] || 0) + 1;
+  return acc;
+}, {});
+console.log(count); // { apple: 2, banana: 1, orange: 1 }
+```
+
+### 4. 深入理解数组复制与引用
+```js
+let a = [1, 2, 3];
+let b = a; // 引用相同地址
+b.push(4);
+console.log(a); // [1, 2, 3, 4]
+```
+
+解决：
+```js
+let c = [...a]; // 浅拷贝
+```
+
+### 5. 性能提示
+- 尽量使用不可变操作（如 `map`、`filter`）。
+- 避免频繁使用 `splice`、`shift` 等修改原数组的方法。
+
+---
+
+## 二、对象（Object）—— 数据与引用的本质
+
+### 1. 对象创建
+```js
+const person = { name: 'Tom', age: 18 };
+const clone = Object.assign({}, person); // 浅拷贝
+```
+
+### 2. 深拷贝与浅拷贝区别
+- 浅拷贝只复制一层。
+- 深拷贝复制所有层级。
+
+实现：
+```js
+const deepCopy = obj => JSON.parse(JSON.stringify(obj));
+```
+
+### 3. Object 常用方法
+```js
+Object.keys(obj);
+Object.values(obj);
+Object.entries(obj);
+Object.assign(target, source);
 ```
 
 ---
 
-## 📘 三、对象与结构化数据
+## 三、Map 与 Set —— 新型数据结构
 
-### 1. 创建对象
+### 1. Set
+存储唯一值：
 ```js
-let person = {
-  name: "Alice",
-  age: 20,
-  greet: function() {
-    console.log("Hi, I'm " + this.name);
-  }
-};
-person.greet();
+const s = new Set([1, 2, 2, 3]);
+console.log([...s]); // [1, 2, 3]
 ```
 
-### 2. 属性访问
+### 2. Map
+可用对象或函数作为键：
 ```js
-console.log(person.name);   // 点语法
-console.log(person["age"]); // 方括号语法
-```
-
-### 3. 遍历对象
-```js
-for (let key in person) {
-  console.log(key, person[key]);
-}
+const m = new Map();
+const obj = { a: 1 };
+m.set(obj, 'hello');
+console.log(m.get(obj)); // hello
 ```
 
 ---
 
-## 📘 四、函数进阶：函数作为值
+## 四、函数进阶：闭包与作用域
 
-### 1. 函数作为参数
+### 1. 闭包定义
+闭包是函数与其词法作用域的组合。
+
 ```js
-function operate(a, b, fn) {
-  return fn(a, b);
-}
-
-function add(x, y) { return x + y; }
-function mul(x, y) { return x * y; }
-
-console.log(operate(2, 3, add)); // 5
-console.log(operate(2, 3, mul)); // 6
-```
-
-### 2. 函数返回函数
-```js
-function makeAdder(x) {
-  return function(y) {
-    return x + y;
-  };
-}
-
-let add5 = makeAdder(5);
-console.log(add5(10)); // 15
-```
-
----
-
-## 📘 五、闭包与作用域链
-```js
-function counter() {
+function outer() {
   let count = 0;
   return function() {
     count++;
     return count;
   };
 }
+const counter = outer();
+console.log(counter()); // 1
+console.log(counter()); // 2
+```
 
-let c = counter();
-console.log(c()); // 1
-console.log(c()); // 2
-console.log(c()); // 3
+### 2. 作用域链
+- 内部函数可访问外部函数变量。
+- 外部函数不能访问内部变量。
+
+### 3. 高阶函数
+高阶函数是指接受函数作为参数或返回函数的函数。
+
+```js
+function isType(type) {
+  return obj => Object.prototype.toString.call(obj) === `[object ${type}]`;
+}
+const isArray = isType("Array");
+console.log(isArray([])); // true
 ```
 
 ---
 
-## 📘 六、递归（Recursion）
+## 五、递归与函数式思维
+
+### 1. 递归的基本结构
 ```js
 function factorial(n) {
-  if (n === 1) return 1;
+  if (n <= 1) return 1;
   return n * factorial(n - 1);
 }
-console.log(factorial(5)); // 120
 ```
 
----
+### 2. 递归的典型用途
+- 计算树状结构节点数
+- 数组扁平化
+- 深拷贝对象
 
-## 📘 七、解构赋值与扩展运算符
 ```js
-let [a, b, c] = [1, 2, 3];
-let { name, age } = { name: "Tom", age: 18 };
-console.log(a, b, name);
-
-let arr1 = [1, 2];
-let arr2 = [...arr1, 3, 4];
-console.log(arr2); // [1,2,3,4]
+function flatten(arr) {
+  return arr.reduce((acc, cur) => acc.concat(Array.isArray(cur) ? flatten(cur) : cur), []);
+}
+console.log(flatten([1, [2, [3, 4]], 5])); // [1,2,3,4,5]
 ```
 
 ---
+
+## 六、ES6+ 新特性强化
+
+### 解构赋值
+```js
+const { name, age } = { name: 'Tom', age: 20 };
+```
+
+### 扩展运算符
+```js
+const obj1 = { a: 1 };
+const obj2 = { b: 2 };
+const merged = { ...obj1, ...obj2 };
+```
+
+---
+
+## 📘 每周练习题 + 答案
+（此处完整保留上次生成的题目与答案部分）
 
 ## 📆 每日学习计划
 
@@ -190,6 +220,18 @@ console.log(arr2); // [1,2,3,4]
 | Day 7 | 总结复习与项目练习 |
 
 ---
+
+## 🧩 每周练习题
+
+* 写一个函数 doubleArray(arr)，将数组中每个元素乘以 2。
+
+* 编写一个函数 findMax(arr)，返回数组中的最大值。
+
+* 创建一个闭包函数 createCounter()，实现计数器功能。
+
+* 使用 reduce() 计算 [1,2,3,4,5] 的和。
+
+* 使用递归编写一个函数 sumTo(n)，返回从 1 加到 n 的结果。
 
 ## 🧩 每周练习题与答案
 
